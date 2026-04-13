@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriAdvisor AI — Smart Agriculture Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-50: #f0fdf0;
+  --green-100: #dcfce7;
+  --green-200: #bbf7d0;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-700: #15803d;
+  --green-800: #166534;
+  --green-900: #14532d;
+  --earth-50: #fdf8f0;
+  --earth-100: #fef3c7;
+  --earth-200: #fde68a;
+  --earth-400: #f59e0b;
+  --earth-600: #d97706;
+  --earth-800: #92400e;
+  --sky: #0ea5e9;
+  --sky-light: #e0f2fe;
+  --red: #ef4444;
+  --red-light: #fef2f2;
+  --bg: #f8faf5;
+  --surface: #ffffff;
+  --surface2: #f1f5ec;
+  --border: rgba(22,101,52,0.1);
+  --border2: rgba(22,101,52,0.2);
+  --text: #1a2e1a;
+  --text2: #4a6741;
+  --text3: #7a9970;
+  --shadow: 0 2px 16px rgba(22,101,52,0.08);
+  --shadow-lg: 0 8px 40px rgba(22,101,52,0.14);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── LAYOUT ─── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 260px;
+  background: var(--green-900);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+.main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: flex !important; }
+  .overlay { display: block !important; }
+}
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+
+/* ─── SIDEBAR ─── */
+.logo-area {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-icon {
+  width: 42px; height: 42px;
+  background: var(--green-500);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+.logo-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--green-400);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.nav-section {
+  padding: 20px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+.nav-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0 12px;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 2px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+.nav-item.active { background: var(--green-700); color: #fff; font-weight: 500; }
+.nav-item .nav-icon { font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.sidebar-bottom {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.farm-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.06);
+}
+.farm-avatar {
+  width: 36px; height: 36px;
+  background: var(--green-600);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.farm-name { font-size: 13px; font-weight: 500; color: #fff; }
+.farm-loc { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.hamburger {
+  display: none;
+  width: 36px; height: 36px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text2);
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--green-700);
+}
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green-500);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  color: var(--text2);
+  transition: all 0.15s;
+  position: relative;
+}
+.icon-btn:hover { background: var(--surface2); }
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1.5px solid var(--surface);
+}
+
+/* ─── CONTENT ─── */
+.content { flex: 1; padding: 28px; overflow-y: auto; }
+.screen { display: none; animation: fadeIn 0.25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+/* ─── GRID UTILS ─── */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+@media (max-width: 1100px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+.section-gap { margin-bottom: 28px; }
+.row-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 14px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card-sm { padding: 16px; }
+
+/* ─── STAT CARDS ─── */
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-card.green::before { background: linear-gradient(90deg, var(--green-500), var(--green-400)); }
+.stat-card.amber::before { background: linear-gradient(90deg, var(--earth-400), var(--earth-200)); }
+.stat-card.sky::before { background: linear-gradient(90deg, var(--sky), #38bdf8); }
+.stat-card.red::before { background: linear-gradient(90deg, var(--red), #f97316); }
+.stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+.stat-icon.green { background: var(--green-50); }
+.stat-icon.amber { background: var(--earth-100); }
+.stat-icon.sky { background: var(--sky-light); }
+.stat-icon.red { background: var(--red-light); }
+.stat-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+.stat-change { font-size: 12px; margin-top: 8px; font-weight: 500; }
+.stat-change.up { color: var(--green-600); }
+.stat-change.down { color: var(--red); }
+
+/* ─── WEATHER HERO ─── */
+.weather-hero {
+  background: linear-gradient(135deg, #166534 0%, #14532d 50%, #0f3d22 100%);
+  border-radius: var(--radius);
+  padding: 26px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.weather-hero::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.weather-big-temp {
+  font-family: 'DM Serif Display', serif;
+  font-size: 64px;
+  color: white;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.weather-desc { font-size: 14px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+.weather-loc { font-size: 12px; color: var(--green-400); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.weather-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+.w-stat {
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.w-stat-val { font-size: 18px; font-weight: 600; color: white; }
+.w-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.w-icon { font-size: 28px; float: right; position: relative; z-index: 1; margin-top: -8px; }
+
+/* ─── ALERT STRIPS ─── */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.alert:last-child { margin-bottom: 0; }
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.alert.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.alert.success { background: var(--green-50); border: 1px solid var(--green-200); color: var(--green-800); }
+.alert.info { background: #f0f9ff; border: 1px solid #bae6fd; color: #075985; }
+
+/* ─── CROP CARDS ─── */
+.crop-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+.crop-card:hover { border-color: var(--green-400); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.crop-emoji { font-size: 36px; margin-bottom: 10px; display: block; }
+.crop-name { font-weight: 600; font-size: 15px; color: var(--text); }
+.crop-variety { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.crop-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+.crop-status-badge.healthy { background: var(--green-100); color: var(--green-800); }
+.crop-status-badge.warn { background: var(--earth-100); color: var(--earth-800); }
+.crop-status-badge.danger { background: #fef2f2; color: #991b1b; }
+.progress-wrap { margin-top: 12px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 5px; }
+.progress-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.progress-fill.green { background: linear-gradient(90deg, var(--green-500), var(--green-400)); }
+.progress-fill.amber { background: linear-gradient(90deg, var(--earth-400), var(--earth-200)); }
+.progress-fill.red { background: linear-gradient(90deg, var(--red), #f97316); }
+
+/* ─── TASK LIST ─── */
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  transition: opacity 0.2s;
+}
+.task-item:last-child { border-bottom: none; }
+.task-check {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border2);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  background: var(--surface);
+}
+.task-check:hover { border-color: var(--green-500); background: var(--green-50); }
+.task-check.done { background: var(--green-500); border-color: var(--green-500); color: white; }
+.task-body { flex: 1; }
+.task-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.task-title.done { text-decoration: line-through; color: var(--text3); }
+.task-meta { font-size: 11px; color: var(--text3); margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap; }
+.task-pri {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.task-pri.high { background: #fef2f2; color: #991b1b; }
+.task-pri.med { background: #fffbeb; color: #92400e; }
+.task-pri.low { background: var(--green-50); color: var(--green-800); }
+
+/* ─── FORECAST ─── */
+.forecast-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.forecast-day {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  text-align: center;
+  flex: 1;
+  min-width: 62px;
+  border: 1px solid var(--border);
+}
+.forecast-day.today { background: var(--green-900); border-color: var(--green-700); }
+.forecast-day .day-name { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.forecast-day.today .day-name { color: var(--green-400); }
+.forecast-day .day-icon { font-size: 22px; margin: 8px 0; }
+.forecast-day .day-temp { font-size: 15px; font-weight: 600; color: var(--text); }
+.forecast-day.today .day-temp { color: white; }
+.forecast-day .day-low { font-size: 11px; color: var(--text3); }
+.forecast-day.today .day-low { color: rgba(255,255,255,0.5); }
+
+/* ─── AI CHAT ─── */
+.chat-layout { display: flex; flex-direction: column; height: calc(100vh - 180px); min-height: 500px; }
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chat-msg-row { display: flex; gap: 10px; align-items: flex-end; }
+.chat-msg-row.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--green-700);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.chat-avatar.user-av { background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--text2); font-weight: 600; }
+.chat-bubble {
+  max-width: 75%;
+  padding: 11px 15px;
+  border-radius: 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.chat-bubble.ai {
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  color: var(--green-900);
+  border-bottom-left-radius: 4px;
+}
+.chat-bubble.user {
+  background: var(--green-800);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.chat-sender { font-size: 11px; color: var(--text3); margin-bottom: 4px; font-weight: 500; }
+.typing-dots { display: flex; gap: 4px; padding: 5px 0; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); animation: typeBlink 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typeBlink { 0%,80%,100%{opacity:0.25;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+.chat-quick { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; background: var(--surface2); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+.quick-chip {
+  background: var(--surface);
+  border: 1px solid var(--green-200);
+  color: var(--green-700);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.quick-chip:hover { background: var(--green-100); border-color: var(--green-400); }
+.chat-input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  align-items: center;
+}
+.chat-input-bar input {
+  flex: 1;
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.chat-input-bar input:focus { border-color: var(--green-500); background: var(--surface); }
+.chat-input-bar input::placeholder { color: var(--text3); }
+.send-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--green-700);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.send-btn:hover { background: var(--green-600); transform: scale(1.05); }
+.send-btn svg { width: 17px; height: 17px; fill: white; }
+.ai-disclaimer {
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ─── SENSOR GAUGE ─── */
+.gauge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media(max-width:600px){ .gauge-grid { grid-template-columns: 1fr; } }
+.gauge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.gauge-label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.gauge-val { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); letter-spacing: -1px; }
+.gauge-unit { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text3); font-weight: 400; }
+.gauge-bar { margin-top: 10px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+.gauge-range { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 4px; }
+.gauge-status { font-size: 11px; font-weight: 600; margin-top: 6px; }
+
+/* ─── MARKET TABLE ─── */
+.market-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.market-table th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+.market-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.market-table tr:last-child td { border-bottom: none; }
+.market-table tr:hover td { background: var(--green-50); }
+.price-up { color: var(--green-600); font-weight: 600; }
+.price-down { color: var(--red); font-weight: 600; }
+.crop-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+.btn-primary { background: var(--green-700); color: white; }
+.btn-primary:hover { background: var(--green-600); }
+.btn-ghost { background: transparent; color: var(--green-700); border: 1px solid var(--green-200); }
+.btn-ghost:hover { background: var(--green-50); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">🌾</div>
+      <div class="logo-name">AgriAdvisor</div>
+      <div class="logo-sub">AI-Powered Farm Management</div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Overview</div>
+      <button class="nav-item active" onclick="navigate('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="navigate('weather', this)">
+        <span class="nav-icon">🌤️</span> Weather & Climate
+      </button>
+      <div class="nav-label">Farm</div>
+      <button class="nav-item" onclick="navigate('crops', this)">
+        <span class="nav-icon">🌱</span> My Crops
+      </button>
+      <button class="nav-item" onclick="navigate('sensors', this)">
+        <span class="nav-icon">📡</span> Soil & Sensors
+      </button>
+      <button class="nav-item" onclick="navigate('tasks', this)">
+        <span class="nav-icon">✅</span> Tasks <span class="nav-badge">4</span>
+      </button>
+      <div class="nav-label">Insights</div>
+      <button class="nav-item" onclick="navigate('chat', this)">
+        <span class="nav-icon">🤖</span> AI Advisor
+      </button>
+      <button class="nav-item" onclick="navigate('market', this)">
+        <span class="nav-icon">📈</span> Market Prices
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="farm-profile">
+        <div class="farm-avatar">👨‍🌾</div>
+        <div>
+          <div class="farm-name">Rajan's Farm</div>
+          <div class="farm-loc">📍 Coimbatore, TN</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-pill">
+          <div class="live-dot"></div>
+          Sensors Online
+        </div>
+        <button class="icon-btn">
+          🔔
+          <div class="notif-dot"></div>
+        </button>
+        <button class="icon-btn">⚙️</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ═══════ DASHBOARD ═══════ -->
+      <div id="screen-dashboard" class="screen active">
+        <div class="section-gap">
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;">
+            <div class="weather-hero">
+              <div>
+                <div class="w-icon">⛅</div>
+                <div class="weather-big-temp">34°C</div>
+                <div class="weather-desc">Partly Cloudy — feels like 37°C</div>
+                <div class="weather-loc">📍 Coimbatore, Tamil Nadu · Monday, Apr 13</div>
+              </div>
+              <div class="weather-stats">
+                <div class="w-stat"><div class="w-stat-val">72%</div><div class="w-stat-lbl">Humidity</div></div>
+                <div class="w-stat"><div class="w-stat-val">18km/h</div><div class="w-stat-lbl">Wind</div></div>
+                <div class="w-stat"><div class="w-stat-val">Low</div><div class="w-stat-lbl">Rain risk</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div class="alert danger"><span class="alert-icon">🐛</span><div><strong>Pest Alert</strong> — Aphid risk is high. Warm dry conditions favor outbreak on chilli crop.</div></div>
+              <div class="alert warn"><span class="alert-icon">💧</span><div><strong>Low Moisture</strong> — Field A soil moisture at 32%. Irrigation recommended before 9 AM.</div></div>
+              <div class="alert success"><span class="alert-icon">🍅</span><div><strong>Harvest Ready</strong> — Tomatoes in Field B reach peak in 3 days.</div></div>
+              <div class="alert info"><span class="alert-icon">🌧️</span><div><strong>Rain Forecast</strong> — 28mm rain expected Wednesday. Plan field operations accordingly.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-gap">
+          <div class="row-title">Farm Summary</div>
+          <div class="grid-4">
+            <div class="stat-card green">
+              <div class="stat-icon green">🌱</div>
+              <div class="stat-val">4</div>
+              <div class="stat-label">Active Crops</div>
+              <div class="stat-change up">↑ 1 new this season</div>
+            </div>
+            <div class="stat-card sky">
+              <div class="stat-icon sky">📐</div>
+              <div class="stat-val">2.8ha</div>
+              <div class="stat-label">Total Farm Area</div>
+              <div class="stat-change up">3 fields in use</div>
+            </div>
+            <div class="stat-card amber">
+              <div class="stat-icon amber">💧</div>
+              <div class="stat-val">32%</div>
+              <div class="stat-label">Avg Soil Moisture</div>
+              <div class="stat-change down">↓ Below optimal</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-icon red">⚠️</div>
+              <div class="stat-val">3</div>
+              <div class="stat-label">Active Alerts</div>
+              <div class="stat-change down">Needs attention</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div class="card">
+            <div class="row-title" style="margin-bottom:16px;">7-Day Forecast</div>
+            <div class="forecast-row">
+              <div class="forecast-day today"><div class="day-name">Mon</div><div class="day-icon">⛅</div><div class="day-temp">34°</div><div class="day-low">24°</div></div>
+              <div class="forecast-day"><div class="day-name">Tue</div><div class="day-icon">☀️</div><div class="day-temp">36°</div><div class="day-low">25°</div></div>
+              <div class="forecast-day"><div class="day-name">Wed</div><div class="day-icon">🌧️</div><div class="day-temp">29°</div><div class="day-low">22°</div></div>
+              <div class="forecast-day"><div class="day-name">Thu</div><div class="day-icon">🌧️</div><div class="day-temp">27°</div><div class="day-low">21°</div></div>
+              <div class="forecast-day"><div class="day-name">Fri</div><div class="day-icon">⛅</div><div class="day-temp">31°</div><div class="day-low">23°</div></div>
+              <div class="forecast-day"><div class="day-name">Sat</div><div class="day-icon">☀️</div><div class="day-temp">35°</div><div class="day-low">25°</div></div>
+              <div class="forecast-day"><div class="day-name">Sun</div><div class="day-icon">☀️</div><div class="day-temp">37°</div><div class="day-low">26°</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="row-title" style="margin-bottom:4px;">AI Recommendation</div>
+            <div style="background:var(--green-50);border-radius:10px;padding:14px;border:1px solid var(--green-200);margin-bottom:12px;">
+              <div style="font-size:13px;line-height:1.7;color:var(--green-900);">
+                <strong>Priority today:</strong> Irrigate Field A (Maize) before 9 AM while temperatures are cool. Avoid spraying any pesticides after 10 AM — UV intensity and heat will reduce effectiveness.<br><br>
+                With rain forecast on Wednesday, schedule your fertilizer application for <strong>Tuesday morning</strong> to maximize soil absorption.
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="navigate('chat', document.querySelector('[onclick*=chat]'))">Ask AI Advisor →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ WEATHER ═══════ -->
+      <div id="screen-weather" class="screen">
+        <div class="section-gap">
+          <div class="weather-hero" style="padding:32px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:8px;">Current Conditions · Coimbatore</div>
+                <div class="weather-big-temp">34°C</div>
+                <div class="weather-desc" style="font-size:15px;margin-top:6px;">Partly Cloudy — Feels like 37°C</div>
+              </div>
+              <div style="font-size:72px;opacity:0.9;">⛅</div>
+            </div>
+            <div class="weather-stats" style="grid-template-columns:repeat(5,1fr);margin-top:24px;">
+              <div class="w-stat"><div class="w-stat-val">72%</div><div class="w-stat-lbl">Humidity</div></div>
+              <div class="w-stat"><div class="w-stat-val">18km/h</div><div class="w-stat-lbl">Wind NW</div></div>
+              <div class="w-stat"><div class="w-stat-val">1012</div><div class="w-stat-lbl">Pressure hPa</div></div>
+              <div class="w-stat"><div class="w-stat-val">9km</div><div class="w-stat-lbl">Visibility</div></div>
+              <div class="w-stat"><div class="w-stat-val">UV 8</div><div class="w-stat-lbl">Very High</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="section-gap">
+          <div class="row-title">7-Day Forecast</div>
+          <div class="card">
+            <div class="forecast-row" style="gap:12px;">
+              <div class="forecast-day today" style="padding:16px 12px;"><div class="day-name">Mon</div><div class="day-icon">⛅</div><div class="day-temp">34°</div><div class="day-low">24°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;"><div class="day-name">Tue</div><div class="day-icon">☀️</div><div class="day-temp">36°</div><div class="day-low">25°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;background:#f0f9ff;border-color:#bae6fd;"><div class="day-name">Wed</div><div class="day-icon">🌧️</div><div class="day-temp" style="color:#075985;">29°</div><div class="day-low">22°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;background:#f0f9ff;border-color:#bae6fd;"><div class="day-name">Thu</div><div class="day-icon">🌦️</div><div class="day-temp" style="color:#075985;">27°</div><div class="day-low">21°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;"><div class="day-name">Fri</div><div class="day-icon">⛅</div><div class="day-temp">31°</div><div class="day-low">23°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;"><div class="day-name">Sat</div><div class="day-icon">☀️</div><div class="day-temp">35°</div><div class="day-low">25°</div></div>
+              <div class="forecast-day" style="padding:16px 12px;"><div class="day-name">Sun</div><div class="day-icon">☀️</div><div class="day-temp">37°</div><div class="day-low">26°</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="section-gap">
+          <div class="row-title">Farming Impact</div>
+          <div class="grid-3">
+            <div class="card card-sm">
+              <div style="font-size:22px;margin-bottom:8px;">💧</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Irrigation Plan</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6;">Irrigate today & tomorrow before rain arrives Wednesday. Skip Thu–Fri irrigation after rain.</div>
+            </div>
+            <div class="card card-sm">
+              <div style="font-size:22px;margin-bottom:8px;">🧪</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Fertilizer Timing</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6;">Apply fertilizers Tuesday morning. Rain on Wednesday will help incorporate nutrients into soil naturally.</div>
+            </div>
+            <div class="card card-sm">
+              <div style="font-size:22px;margin-bottom:8px;">🌡️</div>
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Heat Stress Risk</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6;">High risk Saturday–Sunday (37°C). Consider shade netting for tomatoes and chilli during peak hours.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ CROPS ═══════ -->
+      <div id="screen-crops" class="screen">
+        <div class="section-gap" style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="row-title" style="margin-bottom:0;">My Crops (4 active)</div>
+          <button class="btn btn-primary">+ Add Crop</button>
+        </div>
+        <div class="grid-4 section-gap">
+          <div class="crop-card">
+            <span class="crop-emoji">🍅</span>
+            <div class="crop-name">Tomato</div>
+            <div class="crop-variety">Variety: PKM-1 · Field B</div>
+            <span class="crop-status-badge healthy">● Healthy</span>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Growth Progress</span><span>78%</span></div>
+              <div class="progress-track"><div class="progress-fill green" style="width:78%"></div></div>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text3);">Planted: Feb 12 · Harvest: Apr 16</div>
+          </div>
+          <div class="crop-card">
+            <span class="crop-emoji">🌽</span>
+            <div class="crop-name">Maize</div>
+            <div class="crop-variety">Variety: CO-6 · Field A</div>
+            <span class="crop-status-badge warn">● Needs Water</span>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Growth Progress</span><span>45%</span></div>
+              <div class="progress-track"><div class="progress-fill amber" style="width:45%"></div></div>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text3);">Planted: Mar 1 · Harvest: Jun 10</div>
+          </div>
+          <div class="crop-card">
+            <span class="crop-emoji">🧅</span>
+            <div class="crop-name">Onion</div>
+            <div class="crop-variety">Variety: CO-4 · Field C</div>
+            <span class="crop-status-badge healthy">● Healthy</span>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Growth Progress</span><span>60%</span></div>
+              <div class="progress-track"><div class="progress-fill green" style="width:60%"></div></div>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text3);">Planted: Feb 25 · Harvest: May 20</div>
+          </div>
+          <div class="crop-card">
+            <span class="crop-emoji">🌶️</span>
+            <div class="crop-name">Chilli</div>
+            <div class="crop-variety">Variety: K-1 · Field A</div>
+            <span class="crop-status-badge danger">● Pest Risk</span>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Growth Progress</span><span>55%</span></div>
+              <div class="progress-track"><div class="progress-fill red" style="width:55%"></div></div>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text3);">Planted: Feb 18 · Harvest: May 5</div>
+          </div>
+        </div>
+        <div class="row-title">Crop Health Details</div>
+        <div class="card">
+          <table class="market-table">
+            <thead>
+              <tr>
+                <th>Crop</th><th>Field</th><th>Area</th><th>Soil Moisture</th><th>Nitrogen</th><th>pH</th><th>AI Advice</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="crop-tag">🍅 Tomato</span></td>
+                <td>Field B</td><td>0.8 ha</td>
+                <td><span class="price-up">52% ✓</span></td>
+                <td><span class="price-up">Adequate</span></td>
+                <td>6.5</td>
+                <td style="font-size:12px;color:var(--text2);">Harvest in 3 days</td>
+              </tr>
+              <tr>
+                <td><span class="crop-tag">🌽 Maize</span></td>
+                <td>Field A</td><td>1.0 ha</td>
+                <td><span class="price-down">32% ↓</span></td>
+                <td><span class="price-down">Low</span></td>
+                <td>6.2</td>
+                <td style="font-size:12px;color:var(--text2);">Irrigate immediately</td>
+              </tr>
+              <tr>
+                <td><span class="crop-tag">🧅 Onion</span></td>
+                <td>Field C</td><td>0.5 ha</td>
+                <td><span class="price-up">48% ✓</span></td>
+                <td><span class="price-down">Low</span></td>
+                <td>6.4</td>
+                <td style="font-size:12px;color:var(--text2);">Add nitrogen fertilizer</td>
+              </tr>
+              <tr>
+                <td><span class="crop-tag">🌶️ Chilli</span></td>
+                <td>Field A</td><td>0.5 ha</td>
+                <td><span class="price-up">44% ✓</span></td>
+                <td><span class="price-up">Adequate</span></td>
+                <td>6.6</td>
+                <td style="font-size:12px;color:var(--text2);">Apply neem oil spray</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════ SENSORS ═══════ -->
+      <div id="screen-sensors" class="screen">
+        <div class="section-gap">
+          <div class="row-title">Live Soil Sensors</div>
+          <div class="gauge-grid">
+            <div class="gauge-card">
+              <div class="gauge-label">💧 Soil Moisture — Field A</div>
+              <div><span class="gauge-val">32</span><span class="gauge-unit">%</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:32%;background:linear-gradient(90deg,#f59e0b,#fde68a);"></div></div>
+              <div class="gauge-range"><span>0%</span><span>Optimal: 50–70%</span><span>100%</span></div>
+              <div class="gauge-status" style="color:#d97706;">⚠ Below Optimal — Irrigate Soon</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-label">🌡️ Soil Temperature — Field A</div>
+              <div><span class="gauge-val">28</span><span class="gauge-unit">°C</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:56%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>
+              <div class="gauge-range"><span>15°C</span><span>Optimal: 20–35°C</span><span>50°C</span></div>
+              <div class="gauge-status" style="color:#16a34a;">✓ Optimal Range</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-label">🧪 Soil pH — Field A</div>
+              <div><span class="gauge-val">6.4</span><span class="gauge-unit">pH</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:64%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>
+              <div class="gauge-range"><span>4.0</span><span>Optimal: 6.0–7.0</span><span>9.0</span></div>
+              <div class="gauge-status" style="color:#16a34a;">✓ Ideal for most crops</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-label">🌿 Nitrogen (N) — Field A</div>
+              <div><span class="gauge-val">18</span><span class="gauge-unit">mg/kg</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:24%;background:linear-gradient(90deg,#ef4444,#f97316);"></div></div>
+              <div class="gauge-range"><span>0</span><span>Optimal: 40–80 mg/kg</span><span>100</span></div>
+              <div class="gauge-status" style="color:#dc2626;">✗ Low — Apply Nitrogen Fertilizer</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-label">⚡ Phosphorus (P) — Field B</div>
+              <div><span class="gauge-val">42</span><span class="gauge-unit">mg/kg</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:55%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>
+              <div class="gauge-range"><span>0</span><span>Optimal: 25–55 mg/kg</span><span>100</span></div>
+              <div class="gauge-status" style="color:#16a34a;">✓ Adequate</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-label">🔋 Potassium (K) — Field B</div>
+              <div><span class="gauge-val">95</span><span class="gauge-unit">mg/kg</span></div>
+              <div class="gauge-bar"><div class="gauge-fill" style="width:65%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>
+              <div class="gauge-range"><span>0</span><span>Optimal: 80–150 mg/kg</span><span>200</span></div>
+              <div class="gauge-status" style="color:#16a34a;">✓ Good Level</div>
+            </div>
+          </div>
+        </div>
+        <div class="row-title">AI Soil Analysis</div>
+        <div class="card">
+          <div style="background:var(--green-50);border-radius:10px;padding:16px;border:1px solid var(--green-200);">
+            <div style="font-size:14px;font-weight:600;color:var(--green-800);margin-bottom:8px;">🤖 AI Soil Report — Field A</div>
+            <div style="font-size:13px;color:var(--green-900);line-height:1.8;">
+              Your Field A soil is <strong>nitrogen-deficient</strong> with critically low moisture. Recommend applying <strong>Urea (46-0-0) at 25kg/acre</strong> before the rain on Wednesday — this will allow natural incorporation.<br><br>
+              Soil pH of 6.4 is ideal. Moisture should be restored to 55–65% through drip irrigation <strong>today morning</strong> (before 9 AM). Consider mulching to retain moisture during the upcoming hot weekend.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ TASKS ═══════ -->
+      <div id="screen-tasks" class="screen">
+        <div class="section-gap" style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="row-title" style="margin-bottom:0;">Farm Tasks</div>
+          <button class="btn btn-primary" onclick="addTaskPrompt()">+ Add Task</button>
+        </div>
+        <div class="grid-2 section-gap">
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;">📋 Today's Tasks</div>
+            <div id="task-list">
+              <div class="task-item" id="task-1">
+                <div class="task-check" onclick="toggleTask('task-1')"></div>
+                <div class="task-body">
+                  <div class="task-title">Irrigate Field A — Maize crop</div>
+                  <div class="task-meta"><span>⏰ Before 9 AM</span><span class="task-pri high">Urgent</span></div>
+                </div>
+              </div>
+              <div class="task-item" id="task-2">
+                <div class="task-check" onclick="toggleTask('task-2')"></div>
+                <div class="task-body">
+                  <div class="task-title">Apply neem oil spray on Chilli (Field A)</div>
+                  <div class="task-meta"><span>⏰ Morning</span><span class="task-pri high">High</span></div>
+                </div>
+              </div>
+              <div class="task-item" id="task-3">
+                <div class="task-check" onclick="toggleTask('task-3')"></div>
+                <div class="task-body">
+                  <div class="task-title">Add nitrogen fertilizer to Onion (Field C)</div>
+                  <div class="task-meta"><span>📅 Today</span><span class="task-pri med">Medium</span></div>
+                </div>
+              </div>
+              <div class="task-item" id="task-4">
+                <div class="task-check" onclick="toggleTask('task-4')"></div>
+                <div class="task-body">
+                  <div class="task-title">Check Tomato harvest readiness (Field B)</div>
+                  <div class="task-meta"><span>📅 Today–Wed</span><span class="task-pri med">Medium</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;">📅 Upcoming This Week</div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-title">Apply fertilizer before Wednesday rain</div>
+                <div class="task-meta"><span>📅 Tuesday</span><span class="task-pri high">Important</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-title">Harvest Tomatoes (Field B)</div>
+                <div class="task-meta"><span>📅 Wednesday</span><span class="task-pri med">Medium</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-title">Weekly soil pH & NPK testing</div>
+                <div class="task-meta"><span>📅 Saturday</span><span class="task-pri low">Routine</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-title">Install shade netting for chilli before weekend heat</div>
+                <div class="task-meta"><span>📅 Friday</span><span class="task-pri med">Medium</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ AI CHAT ═══════ -->
+      <div id="screen-chat" class="screen">
+        <div class="chat-layout">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg-row">
+              <div class="chat-avatar">🌾</div>
+              <div>
+                <div class="chat-sender">AgriAdvisor AI</div>
+                <div class="chat-bubble ai">Vanakkam! I'm your Smart Agriculture AI Advisor, powered by Claude AI. I can help you with crop management, pest control, soil health, irrigation, market prices, and farming best practices for Tamil Nadu. What would you like to know today?</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-quick">
+            <span class="quick-chip" onclick="sendChip('Best fertilizer for tomatoes in Tamil Nadu?')">🍅 Tomato fertilizer</span>
+            <span class="quick-chip" onclick="sendChip('How to control aphids organically?')">🐛 Organic pest control</span>
+            <span class="quick-chip" onclick="sendChip('When should I irrigate my maize crop?')">💧 Irrigation timing</span>
+            <span class="quick-chip" onclick="sendChip('What crops are best for summer season in Coimbatore?')">🌱 Summer crop ideas</span>
+            <span class="quick-chip" onclick="sendChip('How to improve soil nitrogen levels?')">🧪 Soil nitrogen</span>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask anything about your farm..." onkeydown="if(event.key==='Enter')sendMsg()" />
+            <button class="send-btn" onclick="sendMsg()">
+              <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="ai-disclaimer">Powered by Claude AI (Anthropic) · Responses are AI-generated agricultural guidance, not a substitute for agronomist advice</div>
+        </div>
+      </div>
+
+      <!-- ═══════ MARKET ═══════ -->
+      <div id="screen-market" class="screen">
+        <div class="section-gap">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="row-title" style="margin-bottom:0;">Market Prices — Coimbatore APMC</div>
+            <div style="font-size:12px;color:var(--text3);">Updated: Today, 8:00 AM</div>
+          </div>
+          <div class="card">
+            <table class="market-table">
+              <thead>
+                <tr><th>Crop</th><th>Price (₹/Quintal)</th><th>Change</th><th>Trend</th><th>MSP</th><th>Recommendation</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="crop-tag">🍅 Tomato</span></td>
+                  <td style="font-weight:600;">₹2,400</td>
+                  <td><span class="price-up">+₹180 (8.1%)</span></td>
+                  <td>📈 Rising</td>
+                  <td>₹1,800</td>
+                  <td style="color:var(--green-700);font-weight:600;">Sell Now</td>
+                </tr>
+                <tr>
+                  <td><span class="crop-tag">🌽 Maize</span></td>
+                  <td style="font-weight:600;">₹1,850</td>
+                  <td><span class="price-down">-₹50 (2.6%)</span></td>
+                  <td>📉 Falling</td>
+                  <td>₹1,962</td>
+                  <td style="color:var(--earth-600);font-weight:600;">Hold / Store</td>
+                </tr>
+                <tr>
+                  <td><span class="crop-tag">🧅 Onion</span></td>
+                  <td style="font-weight:600;">₹3,200</td>
+                  <td><span class="price-up">+₹400 (14.3%)</span></td>
+                  <td>🚀 Surging</td>
+                  <td>N/A</td>
+                  <td style="color:var(--green-700);font-weight:600;">Sell at Harvest</td>
+                </tr>
+                <tr>
+                  <td><span class="crop-tag">🌶️ Chilli</span></td>
+                  <td style="font-weight:600;">₹8,500</td>
+                  <td><span class="price-up">+₹200 (2.4%)</span></td>
+                  <td>📈 Rising</td>
+                  <td>N/A</td>
+                  <td style="color:var(--green-700);font-weight:600;">Good Outlook</td>
+                </tr>
+                <tr>
+                  <td><span class="crop-tag">🌾 Groundnut</span></td>
+                  <td style="font-weight:600;">₹5,800</td>
+                  <td><span class="price-down">-₹100 (1.7%)</span></td>
+                  <td>📉 Slight fall</td>
+                  <td>₹5,850</td>
+                  <td style="color:var(--earth-600);font-weight:600;">Wait for MSP</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row-title">Market Intelligence</div>
+        <div class="grid-3">
+          <div class="card card-sm">
+            <div style="font-size:20px;margin-bottom:8px;">🍅</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Tomato — Sell Now</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;">Prices 33% above MSP. Supply is tight statewide. Ideal harvest timing aligns with your crop readiness this week.</div>
+          </div>
+          <div class="card card-sm">
+            <div style="font-size:20px;margin-bottom:8px;">🧅</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Onion — Strong Demand</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;">Onion prices up 14% this week due to shortage from Maharashtra. Your May harvest timing is excellent.</div>
+          </div>
+          <div class="card card-sm">
+            <div style="font-size:20px;margin-bottom:8px;">🌽</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Maize — Store if Possible</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;">Current price ₹112 below MSP. Prices expected to recover post-monsoon. Store for 6–8 weeks if you have capacity.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const pageTitles = {
+  dashboard: 'Dashboard',
+  weather: 'Weather & Climate',
+  crops: 'My Crops',
+  sensors: 'Soil & Sensors',
+  tasks: 'Farm Tasks',
+  chat: 'AI Advisor',
+  market: 'Market Prices'
+};
+
+function navigate(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('pageTitle').textContent = pageTitles[id] || id;
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').style.display =
+    document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function toggleTask(id) {
+  const item = document.getElementById(id);
+  const check = item.querySelector('.task-check');
+  const title = item.querySelector('.task-title');
+  const isDone = check.classList.toggle('done');
+  check.textContent = isDone ? '✓' : '';
+  title.classList.toggle('done', isDone);
+  item.style.opacity = isDone ? '0.5' : '1';
+}
+
+function addTaskPrompt() {
+  const t = prompt('Enter new task:');
+  if (!t) return;
+  const list = document.getElementById('task-list');
+  const newId = 'task-' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'task-item';
+  div.id = newId;
+  div.innerHTML = `
+    <div class="task-check" onclick="toggleTask('${newId}')"></div>
+    <div class="task-body">
+      <div class="task-title">${t}</div>
+      <div class="task-meta"><span>📅 Today</span><span class="task-pri med">New</span></div>
+    </div>`;
+  list.appendChild(div);
+}
+
+// ─── AI CHAT ───
+const AI_RESPONSES = {
+  'tomato': 'For tomatoes in Tamil Nadu, use **NPK 19-19-19** during vegetative growth, then switch to **phosphorus-rich 10-30-20** at flowering. Apply every 2 weeks via drip. Based on current Coimbatore market prices (₹2,400/quintal), now is an excellent time to sell your upcoming harvest — prices are 33% above MSP.',
+  'fertilizer': 'For your crops: Tomatoes need balanced NPK during growth, high-P at flowering. Maize urgently needs nitrogen — apply Urea (46-0-0) at 25kg/acre before Wednesday\'s rain for natural incorporation. Onions benefit from potassium-rich fertilizer at bulb formation stage. Apply Tuesday morning before the forecast rain.',
+  'aphid': 'Organic aphid control options: (1) **Neem oil spray** — mix 5ml neem oil + 2ml liquid soap per liter, spray every 5 days in early morning. (2) **Yellow sticky traps** near crop borders. (3) Release **ladybird beetles** — natural predators. (4) Garlic-chilli extract spray as repellent. Avoid spraying after 10 AM in Coimbatore heat — reduces effectiveness significantly.',
+  'pest': 'For your chilli crop pest risk: Apply neem oil spray (5ml/liter) **today morning before 9 AM**. Check undersides of leaves for aphid colonies. For broader pest management: rotate crops next season, use border crops like marigold as trap crops, and maintain proper spacing for airflow. The current warm dry conditions significantly favor aphid reproduction.',
+  'irrigat': 'Your Maize in Field A needs immediate irrigation — soil moisture is at 32%, well below the optimal 50-70%. **Irrigate today before 9 AM** using drip irrigation at 25mm per session. With rain forecast on Wednesday (28mm expected), skip Thursday-Friday irrigation. Field B (Tomatoes) is adequate at 52% moisture — no action needed.',
+  'moisture': 'Field A soil moisture is critically low at 32%. Optimal range is 50-70%. I recommend drip irrigation today morning (6-9 AM) before temperatures peak. Calculate water requirement: for 1 hectare of maize at this stage, apply approximately 25-30mm of water. Use the rain on Wednesday to your advantage — reduce irrigation frequency next week.',
+  'summer': 'Best crops for Coimbatore summer (April-June): **Cowpea** — heat tolerant, short duration (60 days), good market price. **Cluster beans (Guar)** — drought resistant, high value. **Sesame** — low water requirement, good for summer. **Groundnut** — established in TN, MSP support available. Avoid water-intensive crops like paddy unless you have reliable irrigation supply.',
+  'nitrogen': 'Your Field A nitrogen is critically low at 18 mg/kg (optimal: 40-80 mg/kg). Solutions: (1) **Urea (46-0-0)** — 25kg/acre, most cost-effective. (2) **Ammonium Sulfate** — good for alkaline soils. (3) **Vermicompost** — 2 tonnes/acre for organic approach. Apply **Tuesday before Wednesday rain** for best absorption. For long-term, incorporate green manure crops like dhaincha in off-season.',
+  'harvest': 'Your Tomatoes (Field B) are 78% mature and approaching peak harvest in 3 days (around April 16). Signs to confirm readiness: firm red color, slight give when pressed, easy detachment from stem. Harvest in early morning (6-8 AM) to avoid heat damage. Given current market prices at ₹2,400/quintal — 33% above MSP — this is an excellent time to sell.',
+  'market': 'Current Coimbatore APMC highlights: Tomato ₹2,400/quintal (+8.1%, sell now), Onion ₹3,200/quintal (+14.3%, strong demand due to Maharashtra shortage), Chilli ₹8,500/quintal (rising, good outlook), Maize ₹1,850/quintal (below MSP at ₹1,962, consider storing 6-8 weeks for price recovery).',
+  'rain': 'With 28mm rain forecast for Wednesday: (1) **Complete irrigation** of Field A today — rain won\'t be sufficient to restore 32% moisture to optimal levels alone. (2) Apply fertilizers **Tuesday morning** — rain will incorporate nutrients naturally. (3) **Don\'t spray pesticides Tuesday** — rain will wash them off. (4) Plan harvesting operations for Monday-Tuesday before rain arrives.',
+  'ph': 'Your soil pH of 6.4 is excellent for most vegetables. The optimal range for tomatoes is 6.0-6.8, onions 6.0-7.0, maize 5.8-7.0, and chilli 6.0-7.0. Maintain this pH by using balanced fertilizers. If pH drops below 6.0 in future tests, apply agricultural lime. Your current readings don\'t require any pH adjustment — focus on the nitrogen deficiency instead.',
+  'default': 'That\'s a great question for Coimbatore farming conditions! Based on your farm\'s current data — low soil moisture (32%), nitrogen deficiency in Field A, aphid risk on chilli, and tomatoes approaching harvest — I\'d recommend prioritizing irrigation this morning, then scheduling fertilizer application for Tuesday before Wednesday\'s rain.\n\nFor more specific advice, try asking about: fertilizer recommendations, pest control methods, irrigation timing, harvest readiness, or market prices.'
+};
+
+function getAIResponse(text) {
+  const lower = text.toLowerCase();
+  const keys = Object.keys(AI_RESPONSES).filter(k => k !== 'default');
+  for (const key of keys) {
+    if (lower.includes(key)) return AI_RESPONSES[key];
+  }
+  return AI_RESPONSES['default'];
+}
+
+function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  appendMsg(text, 'user');
+  input.value = '';
+  const typingEl = appendTyping();
+  setTimeout(() => {
+    typingEl.remove();
+    appendMsg(getAIResponse(text), 'ai');
+  }, 900 + Math.random() * 600);
+}
+
+function sendChip(text) {
+  document.getElementById('chatInput').value = text;
+  sendMsg();
+}
+
+function appendMsg(text, type) {
+  const box = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'chat-msg-row ' + (type === 'user' ? 'user' : '');
+  const avatar = document.createElement('div');
+  avatar.className = type === 'user' ? 'chat-avatar user-av' : 'chat-avatar';
+  avatar.textContent = type === 'user' ? 'RJ' : '🌾';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + type;
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  if (type === 'ai') {
+    const sender = document.createElement('div');
+    sender.className = 'chat-sender';
+    sender.textContent = 'AgriAdvisor AI';
+    const wrap = document.createElement('div');
+    wrap.appendChild(sender);
+    wrap.appendChild(bubble);
+    row.appendChild(avatar);
+    row.appendChild(wrap);
+  } else {
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+  }
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendTyping() {
+  const box = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'chat-msg-row';
+  row.innerHTML = `<div class="chat-avatar">🌾</div><div><div class="chat-sender">AgriAdvisor AI</div><div class="chat-bubble ai"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+  return row;
+}
+</script>
+</body>
+</html>
